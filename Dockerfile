@@ -11,15 +11,13 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     nodejs \
-    npm \
-    sqlite3 \
-    libsqlite3-dev
+    npm
 
 # Limpa o cache do apt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instala extensões PHP do Laravel (incluindo SQLite e PDO)
-RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
+# Instala extensões PHP necessárias para MySQL e Laravel
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
 # Ativa o mod_rewrite do Apache
 RUN a2enmod rewrite
@@ -38,20 +36,16 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-available/*.conf
 
-# Instala dependências e compila os assets
+# Instala dependências do PHP e compila os assets de front-end
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
-# Ajusta permissões
+# Ajusta permissões das pastas de cache e storage
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Garante a criação do banco SQLite (caso use SQLite)
-RUN touch /var/www/html/database/database.sqlite
-RUN chown www-data:www-data /var/www/html/database/database.sqlite
 
 EXPOSE 80
 
-# Script de inicialização: roda as migrations/seeders e inicia o Apache
+# Limpa caches, roda as migrations/seeders no MySQL e inicia o Apache
 CMD php artisan config:clear && \
     php artisan migrate --force --seed && \
     apache2-foreground

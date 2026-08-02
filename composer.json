@@ -31,7 +31,7 @@
             "Tests\\": "tests/"
         }
     },
-    "scripts": {
+   "scripts": {
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
@@ -39,6 +39,12 @@
             "@php artisan migrate --force",
             "npm install --ignore-scripts",
             "npm run build"
+        ],
+        "render-deploy": [
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache",
+            "@php artisan migrate --force --seed"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",

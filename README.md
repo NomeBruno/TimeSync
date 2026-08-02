@@ -30,5 +30,3 @@
 - PHP 8.2+
 - Composer
 - Node.js & NPM (for Tailwind CSS asset compilation)
-
-### Step-by-Step Installation

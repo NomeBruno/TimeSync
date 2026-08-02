@@ -41,10 +41,17 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
 # Ajusta permissões das pastas de cache e storage
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Garante as permissões corretas para as pastas de storage, cache E database
+RUN mkdir -p /var/www/html/database && \
+    touch /var/www/html/database/database.sqlite && \
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database && \
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 
 EXPOSE 80
 
+# Script de inicialização
 CMD php artisan config:clear && \
+    chown -R www-data:www-data /var/www/html/database && \
+    chmod -R 775 /var/www/html/database && \
     php artisan migrate --force && \
     apache2-foreground

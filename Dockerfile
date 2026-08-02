@@ -45,7 +45,8 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 80
 
-# Limpa caches, roda as migrations/seeders no MySQL e inicia o Apache
 CMD php artisan config:clear && \
+    touch /var/www/html/database/database.sqlite && \
+    chown www-data:www-data /var/www/html/database/database.sqlite && \
     php artisan migrate --force --seed && \
     apache2-foreground

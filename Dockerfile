@@ -46,7 +46,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 80
 
 CMD php artisan config:clear && \
-    touch /var/www/html/database/database.sqlite && \
-    chown www-data:www-data /var/www/html/database/database.sqlite && \
-    php artisan migrate --force --seed && \
+    php artisan migrate --force && \
     apache2-foreground
